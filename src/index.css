@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Light Theme Colors */
+  --color-primary: #4f46e5; /* Indigo 600 */
+  --color-primary-dim: #4338ca; /* Indigo 700 */
+  --color-primary-container: #e0e7ff; /* Indigo 100 */
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #312e81; /* Indigo 900 */
+
+  --color-secondary: #0891b2; /* Cyan 600 */
+  --color-secondary-dim: #0e7490; /* Cyan 700 */
+  --color-secondary-container: #cffafe; /* Cyan 100 */
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #164e63; /* Cyan 900 */
+
+  --color-tertiary: #9333ea; /* Purple 600 */
+  --color-tertiary-dim: #7e22ce; /* Purple 700 */
+  --color-tertiary-container: #f3e8ff; /* Purple 100 */
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #581c87; /* Purple 900 */
+
+  /* Light Surfaces */
+  --color-surface: #fafafa; /* Zinc 50 */
+  --color-surface-dim: #f4f4f5; /* Zinc 100 */
+  --color-surface-bright: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f4f4f5; /* Zinc 100 */
+  --color-surface-container: #e4e4e7; /* Zinc 200 */
+  --color-surface-container-high: #d4d4d8; /* Zinc 300 */
+  --color-surface-container-highest: #a1a1aa; /* Zinc 400 */
+
+  --color-on-surface: #18181b; /* Zinc 900 */
+  --color-on-surface-variant: #52525b; /* Zinc 600 */
+  --color-outline: #d4d4d8; /* Zinc 300 */
+  --color-outline-variant: #e4e4e7; /* Zinc 200 */
+
+  /* Semantic Colors */
+  --color-error: #ef4444; /* Red 500 */
+  --color-on-error: #ffffff;
+  --color-error-container: #fee2e2; /* Red 100 */
+  --color-on-error-container: #7f1d1d; /* Red 900 */
+
+  --color-success: #10b981; /* Emerald 500 */
+  --color-warning: #f59e0b; /* Amber 500 */
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2.5rem;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-body antialiased selection:bg-primary/20 selection:text-primary-dim;
+    /* Subtle noise texture for depth */
+    background-image: radial-gradient(circle at 50% 0%, #ffffff 0%, #fafafa 70%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply backdrop-blur-xl bg-white/60 border border-black/5 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)];
+  }
+  
+  .glass-button {
+    @apply backdrop-blur-md bg-white/50 border border-black/5 hover:bg-white/80 transition-all duration-300;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-cyan-600;
+  }
+
+  .primary-gradient {
+    @apply bg-gradient-to-r from-indigo-500 to-cyan-500;
+  }
+  
+  .primary-glow {
+    @apply shadow-[0_0_20px_rgba(79,70,229,0.2)];
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-150%) skewX(-12deg); }
+  100% { transform: translateX(350%) skewX(-12deg); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(79,70,229,0.15); }
+  50% { box-shadow: 0 0 30px rgba(79,70,229,0.3); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}

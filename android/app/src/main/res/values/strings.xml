@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Learn a Bit</string>
+    <string name="title_activity_main">Learn a Bit</string>
+    <string name="package_name">com.youki.learnabit</string>
+    <string name="custom_url_scheme">com.youki.learnabit</string>
+</resources>
