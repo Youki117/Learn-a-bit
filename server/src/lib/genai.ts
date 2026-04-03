@@ -24,7 +24,7 @@ export type AiService = {
 function createClient() {
   const env = loadEnv();
   return new OpenAI({
-    baseURL: 'http://localhost:8000/v1',
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     apiKey: env.geminiApiKey,
   });
 }
