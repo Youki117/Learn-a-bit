@@ -24,7 +24,7 @@ export type AiService = {
 function createClient() {
   const env = loadEnv();
   return new OpenAI({
-    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+    baseURL: 'https://gemini-web-api-c35l.onrender.com/v1',
     apiKey: env.geminiApiKey,
   });
 }
@@ -162,7 +162,7 @@ export async function generateTitles(domain: string): Promise<TitleGroupsResult>
   const client = createClient();
 
   const response = await client.chat.completions.create({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-3.0-flash',
     messages: [
       {
         role: 'user',
@@ -186,7 +186,7 @@ export async function generateArticle(title: string, domain: string): Promise<Ar
   const client = createClient();
 
   const response = await client.chat.completions.create({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-3.0-flash',
     messages: [
       {
         role: 'user',
