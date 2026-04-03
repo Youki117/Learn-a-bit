@@ -162,7 +162,7 @@ export async function generateTitles(domain: string): Promise<TitleGroupsResult>
   const client = createClient();
 
   const response = await client.chat.completions.create({
-    model: 'gemini-3.0-flash',
+    model: 'gemini-1.5-flash',
     messages: [
       {
         role: 'user',
@@ -186,7 +186,7 @@ export async function generateArticle(title: string, domain: string): Promise<Ar
   const client = createClient();
 
   const response = await client.chat.completions.create({
-    model: 'gemini-3.0-flash',
+    model: 'gemini-1.5-flash',
     messages: [
       {
         role: 'user',
