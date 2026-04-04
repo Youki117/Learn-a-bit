@@ -18,6 +18,14 @@ export type LearningLevelState = {
   selectedTitle: string | null;
   articleData: StoredArticleData | null;
   completedAt: string | null;
+  session: {
+    status: 'idle' | 'lesson' | 'quiz' | 'feynman' | 'completed';
+    lessonStep: number;
+    prediction1: { selectedAnswer: number | null; wager: number; resolved: boolean; correct: boolean | null };
+    prediction2: { selectedAnswer: number | null; wager: number; resolved: boolean; correct: boolean | null };
+    quiz: { currentQuestionIndex: number; answers: Array<number | null>; completed: boolean; correctAnswers: number | null; wrongPrompts: string[] };
+    feynman: { draft: string; submitted: boolean; grade: string | null };
+  };
 };
 
 export type LearningProgress = {
@@ -108,6 +116,14 @@ function createDefaultLevel(level: number): LearningLevelState {
     selectedTitle: null,
     articleData: null,
     completedAt: null,
+    session: {
+      status: 'idle',
+      lessonStep: 1,
+      prediction1: { selectedAnswer: null, wager: 100, resolved: false, correct: null },
+      prediction2: { selectedAnswer: null, wager: 100, resolved: false, correct: null },
+      quiz: { currentQuestionIndex: 0, answers: [], completed: false, correctAnswers: null, wrongPrompts: [] },
+      feynman: { draft: '', submitted: false, grade: null },
+    },
   };
 }
 
@@ -126,6 +142,70 @@ function normalizeLevel(value: unknown, level: number): LearningLevelState {
     selectedTitle: typeof record.selectedTitle === 'string' ? record.selectedTitle.trim() || null : null,
     articleData: normalizeArticleData(record.articleData),
     completedAt: typeof record.completedAt === 'string' ? record.completedAt : null,
+    session: normalizeSession(record.session),
+  };
+}
+
+function normalizePredictionSession(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return { selectedAnswer: null, wager: 100, resolved: false, correct: null };
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return {
+    selectedAnswer: typeof record.selectedAnswer === 'number' ? record.selectedAnswer : null,
+    wager: typeof record.wager === 'number' && Number.isFinite(record.wager) ? Math.max(100, Math.trunc(record.wager)) : 100,
+    resolved: record.resolved === true,
+    correct: typeof record.correct === 'boolean' ? record.correct : null,
+  };
+}
+
+function normalizeQuizSession(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return { currentQuestionIndex: 0, answers: [], completed: false, correctAnswers: null, wrongPrompts: [] };
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return {
+    currentQuestionIndex: typeof record.currentQuestionIndex === 'number' ? Math.max(0, Math.trunc(record.currentQuestionIndex)) : 0,
+    answers: Array.isArray(record.answers) ? record.answers.map((item) => (typeof item === 'number' ? item : null)) : [],
+    completed: record.completed === true,
+    correctAnswers: typeof record.correctAnswers === 'number' ? Math.max(0, Math.trunc(record.correctAnswers)) : null,
+    wrongPrompts: Array.isArray(record.wrongPrompts) ? record.wrongPrompts.filter((item): item is string => typeof item === 'string') : [],
+  };
+}
+
+function normalizeFeynmanSession(value: unknown) {
+  if (!value || typeof value !== 'object') {
+    return { draft: '', submitted: false, grade: null };
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return {
+    draft: typeof record.draft === 'string' ? record.draft : '',
+    submitted: record.submitted === true,
+    grade: typeof record.grade === 'string' ? record.grade : null,
+  };
+}
+
+function normalizeSession(value: unknown): LearningLevelState['session'] {
+  if (!value || typeof value !== 'object') {
+    return createDefaultLevel(1).session;
+  }
+
+  const record = value as Record<string, unknown>;
+  const status = record.status;
+
+  return {
+    status: status === 'lesson' || status === 'quiz' || status === 'feynman' || status === 'completed' ? status : 'idle',
+    lessonStep: typeof record.lessonStep === 'number' ? Math.min(Math.max(Math.trunc(record.lessonStep), 1), 5) : 1,
+    prediction1: normalizePredictionSession(record.prediction1),
+    prediction2: normalizePredictionSession(record.prediction2),
+    quiz: normalizeQuizSession(record.quiz),
+    feynman: normalizeFeynmanSession(record.feynman),
   };
 }
 

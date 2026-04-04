@@ -1,18 +1,8 @@
 import React from 'react';
-import { motion } from 'motion/react';
-import { cn } from '@/src/types';
-import {
-  Compass,
-  Map as MapIcon,
-  History,
-  User,
-  Bell,
-  Coins,
-  Menu,
-  BookOpen,
-} from 'lucide-react';
-import { View } from '@/src/types';
+import { cn, View } from '@/src/types';
+import { Bell, Coins, Compass, History, Map as MapIcon, Menu, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { usePlayerMeta } from '../context/PlayerMetaContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,7 +11,6 @@ interface LayoutProps {
   title?: string;
   showBack?: boolean;
   onBack?: () => void;
-  coins?: number;
 }
 
 function getInitials(name: string) {
@@ -40,9 +29,9 @@ export const Layout: React.FC<LayoutProps> = ({
   title = 'Learn a Bit',
   showBack = false,
   onBack,
-  coins = 1240,
 }) => {
   const { loading, userProfile } = useAuth();
+  const { meta } = usePlayerMeta();
   const displayName = userProfile?.display_name || userProfile?.email?.split('@')[0] || '访客';
   const avatarUrl = userProfile?.avatar_url;
   const initials = getInitials(displayName);
@@ -50,7 +39,6 @@ export const Layout: React.FC<LayoutProps> = ({
   return (
     <div className="min-h-[100dvh] bg-black/5 dark:bg-black/90 flex items-center justify-center sm:p-4">
       <div className="w-full max-w-[430px] h-[100dvh] sm:h-[850px] sm:max-h-[90vh] bg-surface relative flex flex-col sm:rounded-[2.5rem] sm:border-[8px] border-black/10 dark:border-white/10 shadow-2xl overflow-hidden selection:bg-primary/30">
-        {/* Top App Bar */}
         <header className="absolute top-0 left-0 w-full z-40 bg-surface/85 backdrop-blur-xl border-b border-black/5 px-4 pt-[calc(env(safe-area-inset-top)+12px)] pb-3 flex justify-between items-center gap-3">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             {showBack ? (
@@ -79,7 +67,7 @@ export const Layout: React.FC<LayoutProps> = ({
           {!showBack && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 glass-button rounded-full shadow-sm shrink-0">
               <Coins className="w-4 h-4 text-secondary fill-secondary" />
-              <span className="font-mono font-bold text-on-surface text-xs">{coins.toLocaleString()}</span>
+              <span className="font-mono font-bold text-on-surface text-xs">{meta.coins.toLocaleString()}</span>
             </div>
           )}
 
@@ -90,12 +78,10 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-y-auto no-scrollbar pt-[76px] pb-[104px]">
           {children}
         </main>
 
-        {/* Bottom Nav Bar */}
         <nav className="absolute bottom-0 left-0 w-full z-40 px-2 pb-[calc(env(safe-area-inset-bottom)+14px)] pt-2 bg-surface/85 backdrop-blur-2xl border-t border-black/5 shadow-[0_-8px_30px_rgba(0,0,0,0.05)] flex justify-around items-center">
           <NavItem
             active={currentView === 'explore' || currentView === 'lesson' || currentView === 'quiz'}
@@ -103,38 +89,26 @@ export const Layout: React.FC<LayoutProps> = ({
             label="探索"
             onClick={() => onViewChange('explore')}
           />
-          <NavItem
-            active={currentView === 'map'}
-            icon={<MapIcon />}
-            label="地图"
-            onClick={() => onViewChange('map')}
-          />
-          <NavItem
-            active={currentView === 'review'}
-            icon={<History />}
-            label="复习"
-            onClick={() => onViewChange('review')}
-          />
-          <NavItem
-            active={currentView === 'profile'}
-            icon={<User />}
-            label="我的"
-            onClick={() => onViewChange('profile')}
-          />
+          <NavItem active={currentView === 'map'} icon={<MapIcon />} label="地图" onClick={() => onViewChange('map')} />
+          <NavItem active={currentView === 'review'} icon={<History />} label="复习" onClick={() => onViewChange('review')} />
+          <NavItem active={currentView === 'profile'} icon={<User />} label="我的" onClick={() => onViewChange('profile')} />
         </nav>
       </div>
     </div>
   );
 };
 
-interface NavItemProps {
+const NavItem = ({
+  active,
+  icon,
+  label,
+  onClick,
+}: {
   active: boolean;
   icon: React.ReactNode;
   label: string;
   onClick: () => void;
-}
-
-const NavItem: React.FC<NavItemProps> = ({ active, icon, label, onClick }) => {
+}) => {
   return (
     <button
       onClick={onClick}
@@ -144,7 +118,10 @@ const NavItem: React.FC<NavItemProps> = ({ active, icon, label, onClick }) => {
       )}
     >
       {React.cloneElement(icon as React.ReactElement, {
-        className: cn('w-6 h-6 transition-colors duration-300', active && 'fill-secondary/20 text-secondary drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]'),
+        className: cn(
+          'w-6 h-6 transition-colors duration-300',
+          active && 'fill-secondary/20 text-secondary drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]',
+        ),
       })}
       <span
         className={cn(

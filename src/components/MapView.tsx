@@ -61,8 +61,8 @@ export const MapView: React.FC<MapViewProps> = ({
     <div className="flex flex-col min-h-full relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_40%),radial-gradient(circle_at_bottom,rgba(79,70,229,0.12),transparent_46%)] pointer-events-none"></div>
 
-      <div className="sticky top-0 z-40 bg-surface/82 backdrop-blur-xl border-b border-black/5 px-4 sm:px-6 pt-4 pb-3">
-        <div className="flex items-center gap-2">
+      <div className="relative z-20 px-4 sm:px-6 pt-4 pb-2">
+        <div className="flex items-center gap-2 rounded-[1.6rem] border border-black/5 bg-surface/82 backdrop-blur-xl px-4 py-3 shadow-[0_12px_28px_rgba(15,23,42,0.05)]">
           <div ref={stripRef} className="flex-1 flex gap-2 overflow-x-auto no-scrollbar">
             {progressCollection.map((progress) => {
               const isActive = progress.domain === activeProgress?.domain;
@@ -118,7 +118,7 @@ export const MapView: React.FC<MapViewProps> = ({
       )}
 
       {activeProgress && (
-        <div className="relative z-10 flex-1 px-4 sm:px-6 pt-8 pb-24">
+        <div className="relative z-10 flex-1 px-4 sm:px-6 pt-2 pb-24">
           <DomainTrack
             progress={activeProgress}
             onNodeSelect={(level) => onNodeSelect(activeProgress.domain, level)}

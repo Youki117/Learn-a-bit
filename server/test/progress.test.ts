@@ -255,13 +255,13 @@ test('GET /api/progress/:domain returns default progress when missing', async ()
   assert.equal(payload.data.currentLevel, 1);
   assert.equal(payload.data.totalLevels, 10);
   assert.equal(payload.data.levels.length, 10);
-  assert.deepEqual(payload.data.levels[0], {
-    level: 1,
-    titleOptions: [],
-    selectedTitle: null,
-    articleData: null,
-    completedAt: null,
-  });
+  assert.equal(payload.data.levels[0].level, 1);
+  assert.deepEqual(payload.data.levels[0].titleOptions, []);
+  assert.equal(payload.data.levels[0].selectedTitle, null);
+  assert.equal(payload.data.levels[0].articleData, null);
+  assert.equal(payload.data.levels[0].completedAt, null);
+  assert.equal(payload.data.levels[0].session.status, 'idle');
+  assert.equal(payload.data.levels[0].session.lessonStep, 1);
 });
 
 test('PUT /api/progress/:domain persists selected article and restores it on GET', async () => {
@@ -277,6 +277,7 @@ test('PUT /api/progress/:domain persists selected article and restores it on GET
   assert.equal(getResult.payload.data.levels[0].selectedTitle, '标题 1A');
   assert.equal(getResult.payload.data.levels[0].articleData.part1, '第一段');
   assert.equal(getResult.payload.data.currentLevel, 2);
+  assert.equal(getResult.payload.data.levels[0].session.status, 'idle');
 });
 
 test('progress is isolated per domain for the same user', async () => {

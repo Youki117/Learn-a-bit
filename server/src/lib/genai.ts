@@ -123,8 +123,21 @@ function stripTrailingCommas(text: string) {
 }
 
 export function parseModelJson<T>(text: string): T {
-  const payload = stripTrailingCommas(extractJsonPayload(text));
-  return JSON.parse(payload) as T;
+  const payload = extractJsonPayload(text);
+  
+  // Guard against non-JSON text starting with characters like '无' (Cannot...)
+  const trimmed = payload.trim();
+  if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+    throw new Error(`AI 服务返回了异常说明（非 JSON）: "${trimmed.slice(0, 50)}..."`);
+  }
+
+  const cleaned = stripTrailingCommas(payload);
+  try {
+    return JSON.parse(cleaned) as T;
+  } catch (error) {
+    console.error('Failed to parse AI response as JSON. Content:', text);
+    throw new Error(`JSON 解析失败: ${error instanceof Error ? error.message : 'Invalid JSON'}`);
+  }
 }
 
 function normalizeTitleGroups(value: unknown): string[][] {
@@ -162,7 +175,7 @@ export async function generateTitles(domain: string): Promise<TitleGroupsResult>
   const client = createClient();
 
   const response = await client.chat.completions.create({
-    model: 'gemini-3.0-flash',
+    model: 'gemini-3.1-flash-lite',
     messages: [
       {
         role: 'user',
@@ -186,7 +199,7 @@ export async function generateArticle(title: string, domain: string): Promise<Ar
   const client = createClient();
 
   const response = await client.chat.completions.create({
-    model: 'gemini-3.0-flash',
+    model: 'gemini-3.1-flash-lite',
     messages: [
       {
         role: 'user',

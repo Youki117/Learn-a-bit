@@ -1,6 +1,51 @@
 import type { ArticleData } from '../types';
-import type { LearningLevelState, LearningProgress } from '../types/learning-progress';
+import type {
+  FeynmanSessionState,
+  LearningLevelState,
+  LearningProgress,
+  LearningSessionState,
+  PredictionSessionState,
+  QuizSessionState,
+} from '../types/learning-progress';
 import { TOTAL_LEVELS } from '../types/learning-progress';
+
+function createPredictionSessionState(): PredictionSessionState {
+  return {
+    selectedAnswer: null,
+    wager: 100,
+    resolved: false,
+    correct: null,
+  };
+}
+
+function createQuizSessionState(): QuizSessionState {
+  return {
+    currentQuestionIndex: 0,
+    answers: [],
+    completed: false,
+    correctAnswers: null,
+    wrongPrompts: [],
+  };
+}
+
+function createFeynmanSessionState(): FeynmanSessionState {
+  return {
+    draft: '',
+    submitted: false,
+    grade: null,
+  };
+}
+
+export function createLearningSessionState(): LearningSessionState {
+  return {
+    status: 'idle',
+    lessonStep: 1,
+    prediction1: createPredictionSessionState(),
+    prediction2: createPredictionSessionState(),
+    quiz: createQuizSessionState(),
+    feynman: createFeynmanSessionState(),
+  };
+}
 
 function createDefaultLevel(level: number): LearningLevelState {
   return {
@@ -9,6 +54,7 @@ function createDefaultLevel(level: number): LearningLevelState {
     selectedTitle: null,
     articleData: null,
     completedAt: null,
+    session: createLearningSessionState(),
   };
 }
 
@@ -84,6 +130,11 @@ export function storeArticleForLevel(
             ...levelState,
             selectedTitle: title,
             articleData,
+            session: {
+              ...levelState.session,
+              status: levelState.completedAt ? 'completed' : 'lesson',
+              lessonStep: Math.max(levelState.session.lessonStep, 1),
+            },
           }
         : levelState,
     ),
@@ -103,6 +154,28 @@ export function completeLevelInProgress(
         ? {
             ...levelState,
             completedAt,
+            session: {
+              ...levelState.session,
+              status: 'completed',
+            },
+          }
+        : levelState,
+    ),
+  };
+}
+
+export function updateLevelSession(
+  progress: LearningProgress,
+  level: number,
+  updater: (session: LearningSessionState) => LearningSessionState,
+): LearningProgress {
+  return {
+    ...progress,
+    levels: progress.levels.map((levelState) =>
+      levelState.level === level
+        ? {
+            ...levelState,
+            session: updater(levelState.session),
           }
         : levelState,
     ),

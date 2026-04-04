@@ -1,6 +1,7 @@
 import { readClientEnv } from '../lib/env';
 import type { LearningProgress } from '../types/learning-progress';
 import type { ApiResponse } from '../types/api';
+import type { PlayerMeta } from '../lib/player-meta';
 
 const clientEnv = readClientEnv();
 
@@ -55,5 +56,17 @@ export async function deleteLearningProgress(token: string, domain: string) {
   return request<{ domain: string }>(`/api/progress/${encodeURIComponent(domain)}`, {
     method: 'DELETE',
     token,
+  });
+}
+
+export async function fetchPlayerMeta(token: string) {
+  return request<PlayerMeta>('/api/player-meta', { token });
+}
+
+export async function savePlayerMeta(token: string, meta: PlayerMeta) {
+  return request<PlayerMeta>('/api/player-meta', {
+    method: 'PUT',
+    token,
+    body: meta,
   });
 }

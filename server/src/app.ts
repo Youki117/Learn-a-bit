@@ -5,11 +5,12 @@ import { registerMeRoutes } from './routes/me';
 import { registerAiRoutes } from './routes/ai';
 import type { AiService } from './lib/genai';
 import { registerProgressRoutes } from './routes/progress';
+import { registerPlayerMetaRoutes } from './routes/player-meta';
 
 export type AppClients = Partial<DbClients> & { ai?: AiService };
 
 const defaultAllowedOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
-const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
+const localOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/i;
 
 function getAllowedOrigins() {
   const configuredOrigin = process.env.APP_URL?.trim();
@@ -46,6 +47,10 @@ export function createApp(clients?: AppClients) {
 
   if (clients?.supabaseAdmin && clients.supabaseAuth) {
     registerMeRoutes(app, {
+      supabaseAdmin: clients.supabaseAdmin,
+      supabaseAuth: clients.supabaseAuth,
+    });
+    registerPlayerMetaRoutes(app, {
       supabaseAdmin: clients.supabaseAdmin,
       supabaseAuth: clients.supabaseAuth,
     });
