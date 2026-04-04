@@ -105,7 +105,7 @@ function normalizeWrongItems(value: unknown): WrongItem[] {
       title: typeof item.title === 'string' ? item.title : '',
       domain: typeof item.domain === 'string' ? item.domain : '',
       prompt: typeof item.prompt === 'string' ? item.prompt : '',
-      source: item.source === 'quiz' ? 'quiz' : 'prediction',
+      source: (item.source === 'quiz' ? 'quiz' : 'prediction') as 'quiz' | 'prediction',
       createdAt: typeof item.createdAt === 'string' ? item.createdAt : new Date().toISOString(),
     }))
     .filter((item) => item.eventId);
