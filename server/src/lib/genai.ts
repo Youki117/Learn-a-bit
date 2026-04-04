@@ -123,12 +123,17 @@ function stripTrailingCommas(text: string) {
 }
 
 export function parseModelJson<T>(text: string): T {
+  // 暴力打印！必须看到中端回传了什么，这行代码能救命。
+  console.log('--- AI 原始响应 (调试用) ---');
+  console.log(text);
+  console.log('--- 打印结束 ---');
+
   const payload = extractJsonPayload(text);
   
   // Guard against non-JSON text starting with characters like '无' (Cannot...)
   const trimmed = payload.trim();
   if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
-    throw new Error(`AI 服务返回了异常说明（非 JSON）: "${trimmed.slice(0, 50)}..."`);
+    throw new Error(`AI 服务返回了异常说明（非 JSON）: "${trimmed.slice(0, 100)}..."`);
   }
 
   const cleaned = stripTrailingCommas(payload);
