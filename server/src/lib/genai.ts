@@ -26,6 +26,7 @@ function createClient() {
   return new OpenAI({
     baseURL: 'https://gemini-web-api-c35l.onrender.com/v1',
     apiKey: env.geminiApiKey,
+    timeout: 90000, // 增加到 90 秒，给 AI 足够时间思考和生成长文本
   });
 }
 
@@ -83,43 +84,8 @@ function extractJsonPayload(text: string) {
 }
 
 function stripTrailingCommas(text: string) {
-  let result = '';
-  let inString = false;
-  let escaped = false;
-
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
-
-    if (inString) {
-      result += char;
-      if (escaped) {
-        escaped = false;
-      } else if (char === '\\') {
-        escaped = true;
-      } else if (char === '"') {
-        inString = false;
-      }
-      continue;
-    }
-
-    if (char === '"') {
-      inString = true;
-      result += char;
-      continue;
-    }
-
-    if (char === ',') {
-      const rest = text.slice(index + 1);
-      const match = rest.match(/^\s*([\]}])/);
-      if (match) {
-        continue;
-      }
-    }
-
-    result += char;
-  }
-
-  return result;
+  // 简化的逻辑：只处理对象或数组结尾前的逗号，避免在循环中使用 slice 和正则
+  return text.replace(/,(\s*[\]}])/g, '$1');
 }
 
 export function parseModelJson<T>(text: string): T {
@@ -208,7 +174,7 @@ export async function generateArticle(title: string, domain: string): Promise<Ar
     messages: [
       {
         role: 'user',
-        content: `请只返回 JSON。根据领域「${safeDomain}」和标题「${safeTitle}」一次性生成文章包，包含 part1, part2, part3, chunkPlan, prediction1, prediction2, quiz。题目全部为 4 选 1，correctIndex 必须是 0-3。输出格式：{ "part1": "...", "part2": "...", "part3": "...", "chunkPlan": ["..."], "prediction1": { "question": "...", "options": ["...", "...", "...", "..."], "correctIndex": 0 }, "prediction2": { "question": "...", "options": ["...", "...", "...", "..."], "correctIndex": 0 }, "quiz": [{ "question": "...", "options": ["...", "...", "...", "..."], "correctIndex": 0 }] }`,
+        content: `请只返回 JSON。根据领域「${safeDomain}」和标题「${safeTitle}」生成文章包。要求：1. 每部分正文控制在 400 字内。2. 包含 quiz。3. 严格遵循 JSON。`,
       },
     ],
   });

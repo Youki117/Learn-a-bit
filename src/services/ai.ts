@@ -21,6 +21,16 @@ async function request<T>(path: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   });
 
+  if (response.status === 502 || response.status === 504) {
+    throw new Error('AI 生成超时或服务器繁忙，请稍后刷新重试 (502)');
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    throw new Error(`服务器响应异常: ${response.status} ${text.slice(0, 50)}`);
+  }
+
   const payload = (await response.json()) as ApiResponse<T>;
 
   if (!response.ok || !payload.success || !payload.data) {
