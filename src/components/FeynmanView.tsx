@@ -23,19 +23,30 @@ export const FeynmanView: React.FC<FeynmanViewProps> = ({
   const [isGrading, setIsGrading] = useState(false);
   const [grade, setGrade] = useState<string | null>(initialGrade);
 
+  // Only sync initial draft when it externally changes to a different value
   useEffect(() => {
-    setText(initialDraft);
+    if (initialDraft !== text) {
+      setText(initialDraft);
+    }
   }, [initialDraft]);
 
   useEffect(() => {
     setGrade(initialGrade);
   }, [initialGrade]);
 
+  // Debounce the draft change sync to parent (and backend)
   useEffect(() => {
-    if (!grade) {
-      onDraftChange?.(text);
-    }
-  }, [grade, onDraftChange, text]);
+    if (grade) return;
+
+    const timer = setTimeout(() => {
+      // Only call onDraftChange if the text has actually changed from initialDraft
+      if (text !== initialDraft) {
+        onDraftChange?.(text);
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [text, grade, onDraftChange, initialDraft]);
 
   const handleSubmit = () => {
     setIsGrading(true);
